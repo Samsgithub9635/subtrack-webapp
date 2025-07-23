@@ -40,7 +40,7 @@ An IDE like IntelliJ IDEA, VS Code, or Cursor
 Installation & Running
 Clone the repo
 
-git clone [https://github.com/your_username/subscription-tracker-app.git](https://github.com/Samsgithub9635/SubTrack)
+git clone [(https://github.com/Samsgithub9635/SubTrack)](https://github.com/Samsgithub9635/subtrack-webapp.git)
 
 Navigate to the project directory
 
