@@ -1,6 +1,5 @@
 package com.subtrack.subtrack.controller;
 
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -8,6 +7,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.subtrack.subtrack.model.SubscriptionForm;
@@ -24,10 +25,13 @@ public class SubscriptionController {
         List<SubscriptionForm> subscriptionList = new ArrayList<>();
 
         // 2. Create some sample subscription objects
-        SubscriptionForm sub1 = new SubscriptionForm(1L, "Netflix", LocalDate.now().plusDays(10), new BigDecimal("15.99"));
-        SubscriptionForm sub2 = new SubscriptionForm(2L, "Spotify Premium", LocalDate.now().plusDays(2), new BigDecimal("9.99"));
-        SubscriptionForm sub3 = new SubscriptionForm(3L, "Adobe Creative Cloud", LocalDate.now().plusMonths(2), new BigDecimal("52.99"));
-        
+        SubscriptionForm sub1 = new SubscriptionForm(1L, "Netflix", LocalDate.now().plusDays(10),
+                new BigDecimal("15.99"));
+        SubscriptionForm sub2 = new SubscriptionForm(2L, "Spotify Premium", LocalDate.now().plusDays(2),
+                new BigDecimal("9.99"));
+        SubscriptionForm sub3 = new SubscriptionForm(3L, "Adobe Creative Cloud", LocalDate.now().plusMonths(2),
+                new BigDecimal("52.99"));
+
         // 3. Add them to the list
         subscriptionList.add(sub1);
         subscriptionList.add(sub2);
@@ -36,6 +40,17 @@ public class SubscriptionController {
         model.addAttribute("subscriptions", subscriptionList);
 
         return "home";
+    }
+
+    // This is the POST method that will handle the form submission to add a new
+    // subscription
+    @PostMapping("/subscriptions/add")
+    public String addSubscription(@ModelAttribute SubscriptionForm form) {
+        // For now, just print the received data to the console to prove it works.
+        System.out.println("Received data from form: " + form);
+
+        // After processing, redirect the user back to the home page.
+        return "redirect:/home";
     }
 
 }
