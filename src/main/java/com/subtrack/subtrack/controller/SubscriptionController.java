@@ -1,56 +1,62 @@
 package com.subtrack.subtrack.controller;
 
+import com.subtrack.subtrack.model.Subscription;
+import com.subtrack.subtrack.model.SubscriptionForm;
+import com.subtrack.subtrack.model.ValidityUnit;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import com.subtrack.subtrack.model.SubscriptionForm;
-
-import org.springframework.ui.Model;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Controller
-@RequestMapping("/")
 public class SubscriptionController {
+
+    private final List<Subscription> subscriptionList = new ArrayList<>();
+    private final AtomicLong idCounter = new AtomicLong();
+
+    public SubscriptionController() {
+        // This constructor needs the arguments to create real data
+        subscriptionList.add(new Subscription(idCounter.incrementAndGet(), "Netflix", LocalDate.now().plusDays(10), new BigDecimal("15.99")));
+        subscriptionList.add(new Subscription(idCounter.incrementAndGet(), "Spotify", LocalDate.now().plusDays(2), new BigDecimal("9.99")));
+    }
 
     @GetMapping("/home")
     public String showHomePage(Model model) {
-        // 1. Create a list to hold our subscriptions
-        List<SubscriptionForm> subscriptionList = new ArrayList<>();
-
-        // 2. Create some sample subscription objects
-        SubscriptionForm sub1 = new SubscriptionForm(1L, "Netflix", LocalDate.now().plusDays(10),
-                new BigDecimal("15.99"));
-        SubscriptionForm sub2 = new SubscriptionForm(2L, "Spotify Premium", LocalDate.now().plusDays(2),
-                new BigDecimal("9.99"));
-        SubscriptionForm sub3 = new SubscriptionForm(3L, "Adobe Creative Cloud", LocalDate.now().plusMonths(2),
-                new BigDecimal("52.99"));
-
-        // 3. Add them to the list
-        subscriptionList.add(sub1);
-        subscriptionList.add(sub2);
-        subscriptionList.add(sub3);
-
         model.addAttribute("subscriptions", subscriptionList);
-
         return "home";
     }
 
-    // This is the POST method that will handle the form submission to add a new
-    // subscription
     @PostMapping("/subscriptions/add")
     public String addSubscription(@ModelAttribute SubscriptionForm form) {
-        // For now, just print the received data to the console to prove it works.
-        System.out.println("Received data from form: " + form);
+        LocalDate nextBillDate = form.getStartDate();
 
-        // After processing, redirect the user back to the home page.
+        // ** THIS IS THE CORRECTED LOGIC **
+        // We compare the UNIT from the form, not the value.
+        if (form.getTrialPeriodUnit() == ValidityUnit.DAYS) {
+            nextBillDate = nextBillDate.plusDays(form.getTrialPeriodValue());
+        } else if (form.getTrialPeriodUnit() == ValidityUnit.MONTHS) {
+            nextBillDate = nextBillDate.plusMonths(form.getTrialPeriodValue());
+        } else if (form.getTrialPeriodUnit() == ValidityUnit.YEARS) {
+            nextBillDate = nextBillDate.plusYears(form.getTrialPeriodValue());
+        }
+
+        // Now this will work because the logic above is correct
+        Subscription newSubscription = new Subscription(
+                idCounter.incrementAndGet(),
+                form.getServiceName(),
+                nextBillDate,
+                form.getAmount()
+        );
+
+        subscriptionList.add(newSubscription);
+
         return "redirect:/home";
     }
-
 }
