@@ -3,6 +3,8 @@ package com.subtrack.subtrack.controller;
 import com.subtrack.subtrack.model.Subscription;
 import com.subtrack.subtrack.model.SubscriptionForm;
 import com.subtrack.subtrack.model.ValidityUnit;
+import com.subtrack.subtrack.repository.SubscriptionRepository;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,45 +20,52 @@ import java.util.concurrent.atomic.AtomicLong;
 @Controller
 public class SubscriptionController {
 
-    private final List<Subscription> subscriptionList = new ArrayList<>();
-    private final AtomicLong idCounter = new AtomicLong();
+    // 1. Declare the repository as a final variable.
+    private final SubscriptionRepository subscriptionRepository;
 
-    public SubscriptionController() {
-        // This constructor needs the arguments to create real data
-        subscriptionList.add(new Subscription(idCounter.incrementAndGet(), "Netflix", LocalDate.now().plusDays(10), new BigDecimal("15.99")));
-        subscriptionList.add(new Subscription(idCounter.incrementAndGet(), "Spotify", LocalDate.now().plusDays(2), new BigDecimal("9.99")));
+    // 2. Use the constructor to receive the repository from Spring.
+    // This is called "Constructor Dependency Injection".
+    public SubscriptionController(SubscriptionRepository subscriptionRepository) {
+        this.subscriptionRepository = subscriptionRepository;
     }
 
     @GetMapping("/home")
     public String showHomePage(Model model) {
-        model.addAttribute("subscriptions", subscriptionList);
+        // 1. Ask the repository for the list of all subscriptions.
+        List<Subscription> allSubscriptions = subscriptionRepository.findAll();
+
+        // 2. Add that list to the model to send to the HTML page.
+        model.addAttribute("subscriptions", allSubscriptions);
+
+        // 3. Return the name of the HTML file.
         return "home";
     }
 
     @PostMapping("/subscriptions/add")
-    public String addSubscription(@ModelAttribute SubscriptionForm form) {
-        LocalDate nextBillDate = form.getStartDate();
-
-        // ** THIS IS THE CORRECTED LOGIC **
-        // We compare the UNIT from the form, not the value.
-        if (form.getTrialPeriodUnit() == ValidityUnit.DAYS) {
-            nextBillDate = nextBillDate.plusDays(form.getTrialPeriodValue());
-        } else if (form.getTrialPeriodUnit() == ValidityUnit.MONTHS) {
-            nextBillDate = nextBillDate.plusMonths(form.getTrialPeriodValue());
-        } else if (form.getTrialPeriodUnit() == ValidityUnit.YEARS) {
-            nextBillDate = nextBillDate.plusYears(form.getTrialPeriodValue());
-        }
-
-        // Now this will work because the logic above is correct
-        Subscription newSubscription = new Subscription(
-                idCounter.incrementAndGet(),
-                form.getServiceName(),
-                nextBillDate,
-                form.getAmount()
-        );
-
-        subscriptionList.add(newSubscription);
-
-        return "redirect:/home";
+public String addSubscription(@ModelAttribute SubscriptionForm form) {
+    // 1. Calculate the next bill date from the form data.
+    LocalDate nextBillDate = form.getStartDate();
+    if (form.getTrialPeriodUnit() == ValidityUnit.DAYS) {
+        nextBillDate = nextBillDate.plusDays(form.getTrialPeriodValue());
+    } else if (form.getTrialPeriodUnit() == ValidityUnit.MONTHS) {
+        nextBillDate = nextBillDate.plusMonths(form.getTrialPeriodValue());
+    } else if (form.getTrialPeriodUnit() == ValidityUnit.YEARS) {
+        nextBillDate = nextBillDate.plusYears(form.getTrialPeriodValue());
     }
+
+    // 2. Create a new Subscription object.
+    Subscription newSubscription = new Subscription(
+            idCounter.incrementAndGet(),
+            form.getServiceName(),
+            nextBillDate,
+            form.getAmount()
+    );
+
+    // 3. Use the repository to SAVE the new subscription.
+    // This will add it to the list AND write it to the JSON file.
+    subscriptionRepository.save(newSubscription);
+
+    // 4. Redirect back to the home page.
+    return "redirect:/home";
+}
 }
