@@ -41,31 +41,33 @@ public class SubscriptionController {
         return "home";
     }
 
+    // We need a temporary ID counter here until we move it to the repository later.
+    private final AtomicLong idCounter = new AtomicLong();
+
     @PostMapping("/subscriptions/add")
-public String addSubscription(@ModelAttribute SubscriptionForm form) {
-    // 1. Calculate the next bill date from the form data.
-    LocalDate nextBillDate = form.getStartDate();
-    if (form.getTrialPeriodUnit() == ValidityUnit.DAYS) {
-        nextBillDate = nextBillDate.plusDays(form.getTrialPeriodValue());
-    } else if (form.getTrialPeriodUnit() == ValidityUnit.MONTHS) {
-        nextBillDate = nextBillDate.plusMonths(form.getTrialPeriodValue());
-    } else if (form.getTrialPeriodUnit() == ValidityUnit.YEARS) {
-        nextBillDate = nextBillDate.plusYears(form.getTrialPeriodValue());
+    public String addSubscription(@ModelAttribute SubscriptionForm form) {
+        // 1. Calculate the next bill date from the form data.
+        LocalDate nextBillDate = form.getStartDate();
+        if (form.getTrialPeriodUnit() == ValidityUnit.DAYS) {
+            nextBillDate = nextBillDate.plusDays(form.getTrialPeriodValue());
+        } else if (form.getTrialPeriodUnit() == ValidityUnit.MONTHS) {
+            nextBillDate = nextBillDate.plusMonths(form.getTrialPeriodValue());
+        } else if (form.getTrialPeriodUnit() == ValidityUnit.YEARS) {
+            nextBillDate = nextBillDate.plusYears(form.getTrialPeriodValue());
+        }
+
+        // 2. Create a new Subscription object.
+        Subscription newSubscription = new Subscription(
+                idCounter.incrementAndGet(),
+                form.getServiceName(),
+                nextBillDate,
+                form.getAmount());
+
+        // 3. Use the repository to SAVE the new subscription.
+        // This will add it to the list AND write it to the JSON file.
+        subscriptionRepository.save(newSubscription);
+
+        // 4. Redirect back to the home page.
+        return "redirect:/home";
     }
-
-    // 2. Create a new Subscription object.
-    Subscription newSubscription = new Subscription(
-            idCounter.incrementAndGet(),
-            form.getServiceName(),
-            nextBillDate,
-            form.getAmount()
-    );
-
-    // 3. Use the repository to SAVE the new subscription.
-    // This will add it to the list AND write it to the JSON file.
-    subscriptionRepository.save(newSubscription);
-
-    // 4. Redirect back to the home page.
-    return "redirect:/home";
-}
 }
