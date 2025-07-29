@@ -62,4 +62,22 @@ public class SubscriptionRepository {
             System.err.println("Error saving subscriptions to file: " + e.getMessage());
         }
     }
+
+
+    /**
+     * Finds a subscription by its ID, removes it from the list,
+     * and saves the updated list back to the JSON file.
+     * @param id The ID of the subscription to delete.
+     */
+    public void deleteById(Long id) {
+        // Find the subscription with the matching ID and remove it from the list.
+        subscriptions.removeIf(subscription -> subscription.getId().equals(id));
+        
+        // After removing, save the smaller list back to the file.
+        try {
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(databaseFile, subscriptions);
+        } catch (IOException e) {
+            System.err.println("Error saving subscriptions to file after deletion: " + e.getMessage());
+        }
+    }
 }
