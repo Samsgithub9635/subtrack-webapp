@@ -7,9 +7,12 @@ import com.subtrack.subtrack.repository.SubscriptionRepository;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -44,7 +47,7 @@ public class SubscriptionController {
     // We need a temporary ID counter here until we move it to the repository later.
     private final AtomicLong idCounter = new AtomicLong();
 
-    @PostMapping("/subscriptions/add")
+    @PostMapping("/subscription/add")
     public String addSubscription(@ModelAttribute SubscriptionForm form) {
         // 1. Calculate the next bill date from the form data.
         LocalDate nextBillDate = form.getStartDate();
@@ -68,6 +71,15 @@ public class SubscriptionController {
         subscriptionRepository.save(newSubscription);
 
         // 4. Redirect back to the home page.
+        return "redirect:/home";
+    }
+
+    @PostMapping("/subscription/delete/{id}")
+    public String deleteSubscription(@PathVariable Long id) {
+        // Tell the repository to delete the subscription with this ID
+        subscriptionRepository.deleteById(id);
+
+        // Redirect back to the home page to see the updated list
         return "redirect:/home";
     }
 }

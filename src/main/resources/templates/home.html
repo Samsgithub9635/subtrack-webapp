@@ -79,27 +79,35 @@
                     <tbody>
                         <!-- Thymeleaf will loop through each 'sub' in the 'subscriptions' list from the model -->
                         <tr th:each="sub : ${subscriptions}" class="border-b border-gray-100 hover:bg-gray-50">
-                    
+                        
                             <!-- Display the service name -->
                             <td class="p-3 flex items-center gap-3">
                                 <img th:src="@{'https://placehold.co/40x40/7c3aed/ffffff?text=' + ${#strings.substring(sub.serviceName, 0, 1)}}" alt="Logo" class="rounded-full">
                                 <span class="font-semibold" th:text="${sub.serviceName}">Netflix</span>
                             </td>
-                    
+                        
                             <!-- Display the next bill date, formatted nicely -->
                             <td class="p-3">
                                 <span class="font-medium" th:text="${#temporals.format(sub.nextBillDate, 'MMM dd, yyyy')}">Aug 05, 2025</span>
                                 <!-- We will add the 'days left' logic later -->
                             </td>
-                    
+                        
                             <!-- Display the amount, formatted as currency -->
                             <td class="p-3 font-semibold" th:text="${'$' + #numbers.formatDecimal(sub.amount, 1, 'COMMA', 2, 'POINT')}">$15.99</td>
-                    
-                            <!-- Action buttons (we will make these work later) -->
-                            <td class="p-3 text-center">
+                        
+                            <!-- =================== THIS IS THE UPDATED SECTION =================== -->
+                            <td class="p-3 text-center flex justify-center items-center gap-2">
+                                <!-- Edit button (we will make this work later) -->
                                 <button class="text-gray-400 hover:text-indigo-600 p-2"><i class="fas fa-pencil-alt"></i></button>
-                                <button class="text-gray-400 hover:text-red-600 p-2"><i class="fas fa-trash-alt"></i></button>
+
+                                <!-- This is the new Delete Form -->
+                                <form th:action="@{/subscription/delete/{id}(id=${sub.id})}" method="post">
+                                    <button type="submit" class="text-gray-400 hover:text-red-600 p-2">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
                             </td>
+                            <!-- ================= END OF THE UPDATED SECTION ================= -->
                         </tr>
                     </tbody>
                 </table>
