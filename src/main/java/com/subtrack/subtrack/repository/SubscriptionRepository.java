@@ -67,33 +67,6 @@ public class SubscriptionRepository {
     }
     
     /**
-     * Finds and returns a single subscription by its unique ID.
-     * @param id The ID of the subscription to find.
-     * @return The Subscription object if found, otherwise null.
-     */
-    public Subscription findById(Long id) {
-        // Use a modern Java Stream to find the first subscription that matches the ID.
-        return subscriptions.stream()
-                .filter(subscription -> subscription.getId().equals(id))
-                .findFirst()
-                .orElse(null); // Return null if no subscription with that ID is found.
-    }
-
-    
-    /**
-     * Finds a subscription by its ID, removes it from the list,
-     * and saves the updated list back to the JSON file.
-     * @param id The ID of the subscription to delete.
-     */
-    public void deleteById(Long id) {
-        // Use the removeIf method to find the subscription with the matching ID and remove it.
-        subscriptions.removeIf(sub -> sub.getId().equals(id));
-        
-        // After removing, save the changes back to the file.
-        saveToFile();
-    }
-
-    /**
      * A private helper method to handle writing to the file to avoid repeating code.
      */
     private void saveToFile() {
@@ -108,4 +81,51 @@ public class SubscriptionRepository {
             System.err.println("Error saving subscriptions to file: " + e.getMessage());
         }
     }
+
+
+    /**
+     * Finds and returns a single subscription by its unique ID.
+     * @param id The ID of the subscription to find.
+     * @return The Subscription object if found, otherwise null.
+     */
+    public Subscription findById(Long id) {
+        // Use a modern Java Stream to find the first subscription that matches the ID.
+        return subscriptions.stream()
+                .filter(subscription -> subscription.getId().equals(id))
+                .findFirst()
+                .orElse(null); // Return null if no subscription with that ID is found.
+    }
+    
+
+    /**
+     * Updates an existing subscription in the list and saves the changes to the file.
+     * @param updatedSubscription The subscription object containing the new details.
+     */
+    public void update(Subscription updatedSubscription) {
+        // Find the index of the old subscription in the list.
+        for (int i = 0; i < subscriptions.size(); i++) {
+            if (subscriptions.get(i).getId().equals(updatedSubscription.getId())) {
+                // Once found, replace the old object with the updated one.
+                subscriptions.set(i, updatedSubscription);
+                break; // Exit the loop once we've found and replaced it.
+            }
+        }
+        // Save the entire updated list back to the file.
+        saveToFile();
+    }
+
+
+    /**
+     * Finds a subscription by its ID, removes it from the list,
+     * and saves the updated list back to the JSON file.
+     * @param id The ID of the subscription to delete.
+     */
+    public void deleteById(Long id) {
+        // Use the removeIf method to find the subscription with the matching ID and remove it.
+        subscriptions.removeIf(sub -> sub.getId().equals(id));
+        
+        // After removing, save the changes back to the file.
+        saveToFile();
+    }
+
 }
