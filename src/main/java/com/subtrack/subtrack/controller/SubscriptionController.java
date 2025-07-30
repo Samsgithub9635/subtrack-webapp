@@ -7,16 +7,12 @@ import com.subtrack.subtrack.repository.SubscriptionRepository;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -42,6 +38,19 @@ public class SubscriptionController {
 
         // 3. Return the name of the HTML file.
         return "home";
+    }
+
+    @GetMapping("/subscription/edit/{id}")
+    public String showEditForm(@PathVariable Long id, Model model) {
+        // 1. Use the new repository method to find the subscription by its ID.
+        Subscription subscriptionToEdit = subscriptionRepository.findById(id);
+
+        // 2. Add the found subscription to the model to send it to the edit form.
+        model.addAttribute("subscription", subscriptionToEdit);
+
+        // 3. We will create this "edit-form.html" page later.
+        // For now, this completes the backend logic for fetching the data.
+        return "edit-form";
     }
 
     // We need a temporary ID counter here until we move it to the repository later.
