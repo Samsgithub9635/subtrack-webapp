@@ -2,6 +2,7 @@ package com.subtrack.subtrack.repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.subtrack.subtrack.model.Subscription;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
@@ -19,34 +20,41 @@ public class SubscriptionRepository {
     // The in-memory copy of our data
     private List<Subscription> subscriptions;
     // The location of our database file
-    private File databaseFile;
+    private final File databaseFile;
 
-    // The constructor runs ONCE when the application starts
-    public SubscriptionRepository(File databaseFile) {
+    // The constructor is updated to safely initialize the final databaseFile field.
+    public SubscriptionRepository() {
         this.objectMapper = new ObjectMapper();
         // We need to tell Jackson how to handle Java's new date/time objects
-        objectMapper.findAndRegisterModules(); 
+        objectMapper.findAndRegisterModules();
+        // Make the JSON output pretty and readable
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         
+        File tempDbFile; // Use a temporary local variable to hold the file reference
         try {
             // Find the subscriptions.json file in our resources folder
-            this.databaseFile = ResourceUtils.getFile("classpath:subscriptions.json");
+            tempDbFile = ResourceUtils.getFile("classpath:subscriptions.json");
             // Read the file and load the data into our list
-            this.subscriptions = objectMapper.readValue(databaseFile, new TypeReference<List<Subscription>>() {});
+            this.subscriptions = objectMapper.readValue(tempDbFile, new TypeReference<List<Subscription>>() {});
         } catch (IOException e) {
             // If the file is empty or doesn't exist, start with an empty list
             System.out.println("Could not read subscriptions.json, starting with an empty list.");
+            tempDbFile = null; // Mark the file as not found
             this.subscriptions = new ArrayList<>();
         }
-        this.databaseFile = databaseFile;
+        // Assign the result to the final field once at the end. This removes the error.
+        this.databaseFile = tempDbFile;
     }
 
+
+    
     /**
      * Returns the full list of all subscriptions currently in memory.
      */
     public List<Subscription> findAll() {
         return subscriptions;
     }
-
+    
     /**
      * Adds a new subscription to the list and saves the entire list back to the JSON file.
      * @param subscription The new subscription object to save.
@@ -55,29 +63,49 @@ public class SubscriptionRepository {
         // Add the new subscription to our in-memory list
         subscriptions.add(subscription);
         // Now, save the updated list back to the file
-        try {
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(databaseFile, subscriptions);
-        } catch (IOException e) {
-            // If we can't save, print an error. In a real app, we'd handle this better.
-            System.err.println("Error saving subscriptions to file: " + e.getMessage());
-        }
+        saveToFile();
+    }
+    
+    /**
+     * Finds and returns a single subscription by its unique ID.
+     * @param id The ID of the subscription to find.
+     * @return The Subscription object if found, otherwise null.
+     */
+    public Subscription findById(Long id) {
+        // Use a modern Java Stream to find the first subscription that matches the ID.
+        return subscriptions.stream()
+                .filter(subscription -> subscription.getId().equals(id))
+                .findFirst()
+                .orElse(null); // Return null if no subscription with that ID is found.
     }
 
-
+    
     /**
      * Finds a subscription by its ID, removes it from the list,
      * and saves the updated list back to the JSON file.
      * @param id The ID of the subscription to delete.
      */
     public void deleteById(Long id) {
-        // Find the subscription with the matching ID and remove it from the list.
-        subscriptions.removeIf(subscription -> subscription.getId().equals(id));
+        // Use the removeIf method to find the subscription with the matching ID and remove it.
+        subscriptions.removeIf(sub -> sub.getId().equals(id));
         
-        // After removing, save the smaller list back to the file.
+        // After removing, save the changes back to the file.
+        saveToFile();
+    }
+
+    /**
+     * A private helper method to handle writing to the file to avoid repeating code.
+     */
+    private void saveToFile() {
+        if (databaseFile == null) {
+            System.err.println("Database file not found, cannot save.");
+            return;
+        }
         try {
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(databaseFile, subscriptions);
+            objectMapper.writeValue(databaseFile, subscriptions);
         } catch (IOException e) {
-            System.err.println("Error saving subscriptions to file after deletion: " + e.getMessage());
+            // If we can't save, print an error. In a real app, we'd handle this better.
+            System.err.println("Error saving subscriptions to file: " + e.getMessage());
         }
     }
 }
