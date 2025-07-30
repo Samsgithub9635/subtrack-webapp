@@ -95,13 +95,13 @@ public class SubscriptionRepository {
                 .findFirst()
                 .orElse(null); // Return null if no subscription with that ID is found.
     }
-    
+
 
     /**
      * Updates an existing subscription in the list and saves the changes to the file.
      * @param updatedSubscription The subscription object containing the new details.
      */
-    public void update(Subscription updatedSubscription) {
+    public void updateById(Subscription updatedSubscription) {
         // Find the index of the old subscription in the list.
         for (int i = 0; i < subscriptions.size(); i++) {
             if (subscriptions.get(i).getId().equals(updatedSubscription.getId())) {
