@@ -40,7 +40,7 @@ public class SubscriptionController {
         return "home";
     }
 
-    @GetMapping("/subscription/edit/{id}")
+    @GetMapping("/subscription/find/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         // 1. Use the new repository method to find the subscription by its ID.
         Subscription subscriptionToEdit = subscriptionRepository.findById(id);
@@ -67,7 +67,6 @@ public class SubscriptionController {
         } else if (form.getTrialPeriodUnit() == ValidityUnit.YEARS) {
             nextBillDate = nextBillDate.plusYears(form.getTrialPeriodValue());
         }
-
         // 2. Create a new Subscription object.
         Subscription newSubscription = new Subscription(
                 idCounter.incrementAndGet(),
@@ -80,6 +79,16 @@ public class SubscriptionController {
         subscriptionRepository.save(newSubscription);
 
         // 4. Redirect back to the home page.
+        return "redirect:/home";
+    }
+
+    @PostMapping("/subscription/edit/{id}")
+    public String editSubscription(@PathVariable Long id, @ModelAttribute Subscription subscription) {
+        // 1. Use the repository to update the subscription.
+        // This will find it by ID, update it in memory, and save the whole list back to the file.
+        subscriptionRepository.updateById(subscription);
+
+        // 2. Redirect back to the home page to see the updated list.
         return "redirect:/home";
     }
 
