@@ -157,19 +157,19 @@
             </div>
             <!-- Modal Body -->
             <div class="p-6">
-                <form action="#" th:action="@{/subscriptions/add}" method="post">
+                <form action="#" th:action="@{/subscription/add}" th:object="${subscriptionForm}" method="post">
                     <div class="space-y-4">
                         <div>
                             <label for="serviceName" class="block text-sm font-medium text-gray-700 mb-1">Service
                                 Name</label>
-                            <input type="text" id="serviceName" name="serviceName"
+                            <input type="text" id="serviceName" name="serviceName" th:field="*{serviceName}"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 placeholder="e.g., Netflix" required>
                         </div>
                         <div>
                             <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">Subscription
                                 Start Date</label>
-                            <input type="date" id="startDate" name="startDate"
+                            <input type="date" id="startDate" name="startDate" th:field="*{startDate}"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 required>
                         </div>
@@ -178,25 +178,24 @@
                                 Period</label>
                             <div class="flex gap-2">
                                 <input type="number" id="trialPeriodValue" name="trialPeriodValue"
+                                    th:field="*{trialPeriodValue}"
                                     class="w-1/2 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     placeholder="e.g., 7" required>
-                                <select id="trialPeriodUnit" name="trialPeriodUnit"
+                                <select id="trialPeriodUnit" name="trialPeriodUnit" th:field="*{trialPeriodUnit}"
                                     class="w-1/2 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                    <option value="DAYS">Days</option>
-                                    <option value="MONTHS">Months</option>
-                                    <option value="YEARS">Years</option>
+                                    <option th:each="unit : ${T(com.subtrack.subtrack.model.ValidityUnit).values()}"
+                                        th:value="${unit}" th:text="${unit.displayName}">Days</option>
                                 </select>
                             </div>
                         </div>
                         <div>
                             <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">Subscription Fee
                                 ($)</label>
-                            <input type="number" step="0.01" id="amount" name="amount"
+                            <input type="number" step="0.01" id="amount" name="amount" th:field="*{amount}"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 placeholder="e.g., 15.99" required>
                         </div>
                     </div>
-                    <!-- Modal Footer -->
                     <div class="flex justify-end gap-4 pt-6">
                         <button type="button" onclick="closeModal('addSubscriptionModal')"
                             class="bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">Cancel</button>

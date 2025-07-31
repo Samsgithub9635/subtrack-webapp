@@ -30,13 +30,12 @@ public class SubscriptionController {
 
     @GetMapping("/home")
     public String showHomePage(Model model) {
-        // 1. Ask the repository for the list of all subscriptions.
         List<Subscription> allSubscriptions = subscriptionRepository.findAll();
-
-        // 2. Add that list to the model to send to the HTML page.
         model.addAttribute("subscriptions", allSubscriptions);
 
-        // 3. Return the name of the HTML file.
+        // Add an empty form object for the modal
+        model.addAttribute("subscriptionForm", new SubscriptionForm());
+
         return "home";
     }
 
@@ -85,7 +84,8 @@ public class SubscriptionController {
     @PostMapping("/subscription/edit/{id}")
     public String editSubscription(@PathVariable Long id, @ModelAttribute Subscription subscription) {
         // 1. Use the repository to update the subscription.
-        // This will find it by ID, update it in memory, and save the whole list back to the file.
+        // This will find it by ID, update it in memory, and save the whole list back to
+        // the file.
         subscriptionRepository.updateById(subscription);
 
         // 2. Redirect back to the home page to see the updated list.
