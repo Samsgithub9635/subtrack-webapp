@@ -110,13 +110,15 @@
 
                             <!-- Display the next bill date, formatted nicely -->
                             <td class="p-3">
+                                <span class="font-medium"
+                                    th:text="${#temporals.format(sub.nextBillDate, 'MMM dd, yyyy')}">Aug 05, 2025</span>
+
                                 <span
                                     th:if="${#temporals.diffDays(sub.nextBillDate, T(java.time.LocalDate).now()).getDays() <= 3}"
                                     class="text-red-500 font-bold ml-2">
                                     (${#temporals.diffDays(sub.nextBillDate, T(java.time.LocalDate).now()).getDays()}
                                     days left)
                                 </span>
-                                <!-- We will add the 'days left' logic later -->
                             </td>
 
                             <!-- Display the amount, formatted as currency -->
