@@ -36,4 +36,9 @@ public class Subscription {
     public BigDecimal getAmount() {
         return amount;
     }
+
+    public void setId(long incrementAndGet) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setId'");
+    }
 }
