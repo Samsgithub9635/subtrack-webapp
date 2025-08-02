@@ -51,31 +51,30 @@ public class SubscriptionController {
             System.err.println("Form has validation errors: " + bindingResult.getAllErrors());
             return "redirect:/home";
         }
-        // ... rest of the code
-    }
 
-    // Initialize nextBillDate with the start date, as this is the base case
-    LocalDate nextBillDate = form.getStartDate();
+        // Initialize nextBillDate with the start date, as this is the base case
+        LocalDate nextBillDate = form.getStartDate();
 
-    // Then apply the trial period logic
-    if(form.getTrialPeriodUnit()==ValidityUnit.DAYS)
-    {
-        nextBillDate = nextBillDate.plusDays(form.getTrialPeriodValue());
-    }else if(form.getTrialPeriodUnit()==ValidityUnit.MONTHS)
-    {
-        nextBillDate = nextBillDate.plusMonths(form.getTrialPeriodValue());
-    }else if(form.getTrialPeriodUnit()==ValidityUnit.YEARS)
-    {
-        nextBillDate = nextBillDate.plusYears(form.getTrialPeriodValue());
-    }
+        // Then apply the trial period logic
+        if(form.getTrialPeriodUnit()==ValidityUnit.DAYS)
+        {
+            nextBillDate = nextBillDate.plusDays(form.getTrialPeriodValue());
+        }else if(form.getTrialPeriodUnit()==ValidityUnit.MONTHS)
+        {
+            nextBillDate = nextBillDate.plusMonths(form.getTrialPeriodValue());
+        }else if(form.getTrialPeriodUnit()==ValidityUnit.YEARS)
+        {
+            nextBillDate = nextBillDate.plusYears(form.getTrialPeriodValue());
+        }
 
-    Subscription newSubscription = new Subscription(
-            null,
-            form.getServiceName(),
-            nextBillDate,
-            form.getAmount());
+        Subscription newSubscription = new Subscription(
+                null,
+                form.getServiceName(),
+                nextBillDate,
+                form.getAmount());
 
-    subscriptionRepository.save(newSubscription);return"redirect:/home";
+        subscriptionRepository.save(newSubscription);
+        return "redirect:/home";
     }
 
     @PostMapping("/subscription/edit/{id}")
