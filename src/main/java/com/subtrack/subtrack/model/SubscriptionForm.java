@@ -33,7 +33,7 @@ public class SubscriptionForm {
         return startDate;
     }
 
-    public int getTrialPeriodValue() {
+     public Integer getTrialPeriodValue() {
         return trialPeriodValue;
     }
 
@@ -54,7 +54,7 @@ public class SubscriptionForm {
         this.startDate = startDate;
     }
 
-    public void setTrialPeriodValue(int trialPeriodValue) {
+    public void setTrialPeriodValue(Integer trialPeriodValue) {
         this.trialPeriodValue = trialPeriodValue;
     }
 
