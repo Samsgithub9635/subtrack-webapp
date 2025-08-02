@@ -186,7 +186,7 @@
                                 <select id="trialPeriodUnit" name="trialPeriodUnit" th:field="*{trialPeriodUnit}"
                                     class="w-1/2 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                     <option th:each="unit : ${T(com.subtrack.subtrack.model.ValidityUnit).values()}"
-                                        th:value="${unit}" th:text="${unit.displayName}">Days</option>
+                                        th:value="${unit}" th:text="${unit.name()}">Days</option>
                                 </select>
                             </div>
                         </div>
