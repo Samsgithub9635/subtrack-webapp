@@ -35,12 +35,18 @@ public class SubscriptionController {
         return "home";
     }
 
-    @GetMapping("/subscription/find/{id}")
+    @GetMapping("/subscription/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
-        // Updated to use the new Optional return type
+        // Find the subscription by ID.
+        // We use orElseThrow to return a 404 if the ID is not found.
         Subscription subscriptionToEdit = subscriptionRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Subscription not found with ID: " + id));
+
+        // Add the found subscription to the model. The 'th:object' will bind to this.
         model.addAttribute("subscription", subscriptionToEdit);
+
+        // Return the name of the new HTML template.
         return "edit-form";
     }
 
@@ -56,14 +62,11 @@ public class SubscriptionController {
         LocalDate nextBillDate = form.getStartDate();
 
         // Then apply the trial period logic
-        if(form.getTrialPeriodUnit()==ValidityUnit.DAYS)
-        {
+        if (form.getTrialPeriodUnit() == ValidityUnit.DAYS) {
             nextBillDate = nextBillDate.plusDays(form.getTrialPeriodValue());
-        }else if(form.getTrialPeriodUnit()==ValidityUnit.MONTHS)
-        {
+        } else if (form.getTrialPeriodUnit() == ValidityUnit.MONTHS) {
             nextBillDate = nextBillDate.plusMonths(form.getTrialPeriodValue());
-        }else if(form.getTrialPeriodUnit()==ValidityUnit.YEARS)
-        {
+        } else if (form.getTrialPeriodUnit() == ValidityUnit.YEARS) {
             nextBillDate = nextBillDate.plusYears(form.getTrialPeriodValue());
         }
 
@@ -84,9 +87,19 @@ public class SubscriptionController {
         return "redirect:/home";
     }
 
+    // ... (your existing controller code)
+
     @PostMapping("/subscription/delete/{id}")
     public String deleteSubscription(@PathVariable Long id) {
+        // Check if the subscription exists before attempting to delete it
+        if (subscriptionRepository.findById(id).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found with ID: " + id);
+        }
+
+        // Tell the repository to delete the subscription with this ID
         subscriptionRepository.deleteById(id);
+
+        // Redirect back to the home page to see the updated list
         return "redirect:/home";
     }
 }

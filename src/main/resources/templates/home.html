@@ -129,15 +129,21 @@
                             <!-- =================== THIS IS THE UPDATED SECTION =================== -->
                             <td class="p-3 text-center flex justify-center items-center gap-2">
                                 <!-- Edit button (we will make this work later) -->
-                                <button class="text-gray-400 hover:text-indigo-600 p-2"><i
-                                        class="fas fa-pencil-alt"></i></button>
+                            <td class="p-3 text-center">
+                                <div class="flex justify-center items-center gap-2">
+                                    <a th:href="@{/subscription/edit/{id}(id=${sub.id})}"
+                                        class="text-gray-400 hover:text-indigo-600 p-2">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
 
-                                <!-- This is the new Delete Form -->
-                                <form th:action="@{/subscription/delete/{id}(id=${sub.id})}" method="post">
-                                    <button type="submit" class="text-gray-400 hover:text-red-600 p-2">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
+
+                                    <!-- This is the new Delete Form -->
+                                    <form th:action="@{/subscription/delete/{id}(id=${sub.id})}" th:method="post">
+                                        <button type="submit" class="text-gray-400 hover:text-red-600 p-2">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                             <!-- ================= END OF THE UPDATED SECTION ================= -->
                         </tr>
