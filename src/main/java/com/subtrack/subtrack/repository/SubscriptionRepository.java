@@ -16,11 +16,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class SubscriptionRepository {
-
     private final ObjectMapper objectMapper;
     private final List<Subscription> subscriptions;
     private final File databaseFile;
-    // New: The ID counter is now managed here
     private final AtomicLong idCounter;
 
     public SubscriptionRepository() {
@@ -45,7 +43,6 @@ public class SubscriptionRepository {
         
         this.databaseFile = tempDbFile;
         this.subscriptions = loadedSubscriptions;
-        // New: Initialize the counter with the max ID found
         this.idCounter = new AtomicLong(maxId);
     }
     
@@ -54,9 +51,15 @@ public class SubscriptionRepository {
     }
     
     public void save(Subscription subscription) {
-        // New: Assign a new ID before saving
-        subscription.setId(idCounter.incrementAndGet());
-        subscriptions.add(subscription);
+        // Corrected logic: Get the new ID, then create a new object with that ID.
+        Long newId = idCounter.incrementAndGet();
+        Subscription newSubscription = new Subscription(
+            newId, // Pass the new ID in the constructor
+            subscription.getServiceName(),
+            subscription.getNextBillDate(),
+            subscription.getAmount()
+        );
+        subscriptions.add(newSubscription);
         saveToFile();
     }
     
@@ -72,7 +75,6 @@ public class SubscriptionRepository {
         }
     }
 
-    // Updated to return an Optional, which is a modern and safer practice
     public Optional<Subscription> findById(Long id) {
         return subscriptions.stream()
                 .filter(subscription -> subscription.getId().equals(id))
@@ -80,7 +82,7 @@ public class SubscriptionRepository {
     }
     
     public void updateById(Subscription updatedSubscription) {
-        // ... (existing update logic is fine, no changes needed here)
+        // ... (this method also needs to be fixed to create a new object)
         for (int i = 0; i < subscriptions.size(); i++) {
             if (subscriptions.get(i).getId().equals(updatedSubscription.getId())) {
                 subscriptions.set(i, updatedSubscription);
