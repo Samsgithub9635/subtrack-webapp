@@ -1,38 +1,59 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Subscription</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h1 class="text-2xl font-bold mb-6 text-center">Edit Subscription</h1>
-        
-        <form action="#" th:action="@{/subscription/edit/{id}(id=${subscription.id})}" th:object="${subscription}" method="post">
+
+        <form action="#" th:action="@{/subscription/edit/{id}(id=${subscription.id})}" th:object="${subscription}"
+            method="post">
             <input type="hidden" th:field="*{id}">
 
             <div class="mb-4">
                 <label for="serviceName" class="block text-gray-700 font-bold mb-2">Service Name</label>
-                <input type="text" id="serviceName" th:field="*{serviceName}" class="w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                <input type="text" id="serviceName" th:field="*{serviceName}"
+                    th:classappend="${#fields.hasErrors('serviceName')} ? 'border-red-500' : ''"
+                    class="w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="e.g., Netflix">
+                <!-- This span displays the error message if one exists -->
+                <span class="text-red-500 text-sm mt-1" th:if="${#fields.hasErrors('serviceName')}"
+                    th:errors="*{serviceName}"></span>
             </div>
 
             <div class="mb-4">
                 <label for="nextBillDate" class="block text-gray-700 font-bold mb-2">Next Bill Date</label>
-                <input type="date" id="nextBillDate" th:field="*{nextBillDate}" class="w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                <input type="date" id="nextBillDate" th:field="*{nextBillDate}"
+                    th:classappend="${#fields.hasErrors('nextBillDate')} ? 'border-red-500' : ''"
+                    class="w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <span class="text-red-500 text-sm mt-1" th:if="${#fields.hasErrors('nextBillDate')}"
+                    th:errors="*{nextBillDate}">Next bill date error</span>
             </div>
-            
+
             <div class="mb-4">
                 <label for="amount" class="block text-gray-700 font-bold mb-2">Amount ($)</label>
-                <input type="number" step="0.01" id="amount" th:field="*{amount}" class="w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                <input type="number" step="0.01" id="amount" th:field="*{amount}"
+                    th:classappend="${#fields.hasErrors('amount')} ? 'border-red-500' : ''"
+                    class="w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <span class="text-red-500 text-sm mt-1" th:if="${#fields.hasErrors('amount')}"
+                    th:errors="*{amount}">Amount error</span>
             </div>
-            
+
             <div class="flex justify-between mt-6">
-                <a href="/home" class="bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors">Cancel</a>
-                <button type="submit" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">Update Subscription</button>
+                <a href="/home"
+                    class="bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors">Cancel</a>
+                <button type="submit"
+                    class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">Update
+                    Subscription</button>
             </div>
         </form>
     </div>
 </body>
+
 </html>

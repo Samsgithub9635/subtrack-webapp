@@ -52,16 +52,16 @@ public class SubscriptionController {
 
     @PostMapping("/subscription/add")
     public String addSubscription(@Valid @ModelAttribute("subscriptionForm") SubscriptionForm form,
-            BindingResult bindingResult) {
+            BindingResult bindingResult,
+            Model model) { // Pass the Model to handle the data for the view
         if (bindingResult.hasErrors()) {
             System.err.println("Form has validation errors: " + bindingResult.getAllErrors());
-            return "redirect:/home";
+            // This is the key change: Don't redirect. Re-render the view directly.
+            model.addAttribute("subscriptions", subscriptionRepository.findAll()); // Re-add the list of subscriptions
+            return "home";
         }
 
-        // Initialize nextBillDate with the start date, as this is the base case
         LocalDate nextBillDate = form.getStartDate();
-
-        // Then apply the trial period logic
         if (form.getTrialPeriodUnit() == ValidityUnit.DAYS) {
             nextBillDate = nextBillDate.plusDays(form.getTrialPeriodValue());
         } else if (form.getTrialPeriodUnit() == ValidityUnit.MONTHS) {
@@ -77,17 +77,25 @@ public class SubscriptionController {
                 form.getAmount());
 
         subscriptionRepository.save(newSubscription);
-        return "redirect:/home";
+        return "redirect:/home"; // Redirect only on success
     }
 
+
     @PostMapping("/subscription/edit/{id}")
-    public String editSubscription(@PathVariable Long id, @ModelAttribute Subscription subscription) {
-        subscription.setId(id); // Ensure the ID is set from the path variable
+    public String editSubscription(@PathVariable Long id,
+            @Valid @ModelAttribute("subscription") Subscription subscription,
+            BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // If there are errors, return the edit-form view directly
+            // The `subscription` object with the user's data and errors is automatically
+            // available.
+            return "edit-form";
+        }
+
+        subscription.setId(id);
         subscriptionRepository.updateById(subscription);
         return "redirect:/home";
     }
-
-    // ... (your existing controller code)
 
     @PostMapping("/subscription/delete/{id}")
     public String deleteSubscription(@PathVariable Long id) {
