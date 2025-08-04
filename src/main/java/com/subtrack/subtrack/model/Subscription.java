@@ -11,8 +11,12 @@ public class Subscription {
     private LocalDate nextBillDate;
     private BigDecimal amount;
 
-    // THIS IS THE CONSTRUCTOR THE CONTROLLER NEEDS.
-    // It must exist and have these exact parameters.
+    // A default constructor is needed for Spring to be able to create an instance
+    // when mapping from JSON or a form.
+    public Subscription() {
+    }
+
+    // A parameterized constructor is still useful for creating new objects.
     public Subscription(Long id, String serviceName, LocalDate nextBillDate, BigDecimal amount) {
         this.id = id;
         this.serviceName = serviceName;
@@ -37,8 +41,20 @@ public class Subscription {
         return amount;
     }
 
-    public void setId(long incrementAndGet) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setId'");
+    // You also need setters to be able to modify the object's state.
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public void setNextBillDate(LocalDate nextBillDate) {
+        this.nextBillDate = nextBillDate;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 }

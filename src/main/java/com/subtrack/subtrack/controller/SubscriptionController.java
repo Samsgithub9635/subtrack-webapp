@@ -52,13 +52,10 @@ public class SubscriptionController {
 
     @PostMapping("/subscription/add")
     public String addSubscription(@Valid @ModelAttribute("subscriptionForm") SubscriptionForm form,
-            BindingResult bindingResult,
-            Model model) { // Pass the Model to handle the data for the view
+            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             System.err.println("Form has validation errors: " + bindingResult.getAllErrors());
-            // This is the key change: Don't redirect. Re-render the view directly.
-            model.addAttribute("subscriptions", subscriptionRepository.findAll()); // Re-add the list of subscriptions
-            return "home";
+            return "redirect:/home"; // <-- This is the issue
         }
 
         LocalDate nextBillDate = form.getStartDate();
@@ -79,7 +76,6 @@ public class SubscriptionController {
         subscriptionRepository.save(newSubscription);
         return "redirect:/home"; // Redirect only on success
     }
-
 
     @PostMapping("/subscription/edit/{id}")
     public String editSubscription(@PathVariable Long id,
